@@ -1,0 +1,44 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:paddingBottom="@dimen/activity_vertical_margin"
+              android:paddingLeft="@dimen/activity_horizontal_margin"
+              android:paddingRight="@dimen/activity_horizontal_margin"
+              android:paddingTop="@dimen/activity_vertical_margin">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="2dp"
+        android:paddingTop="2dp"
+        android:paddingLeft="8dp"
+        android:textSize="20sp"
+        android:textColor="@android:color/white"
+        android:background="@android:color/background_dark"
+        android:text="@string/paired_device"/>
+
+    <ListView
+        android:id="@+id/paired_device"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
+        android:paddingLeft="8dp"
+        android:textColor="@android:color/white"
+        android:background="@android:color/background_dark"
+        android:text="@string/new_discovery_device"/>
+
+    <ListView
+        android:id="@+id/new_discovery_device"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+ />
+
+</LinearLayout>
