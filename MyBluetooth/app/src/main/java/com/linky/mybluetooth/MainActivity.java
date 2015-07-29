@@ -2,12 +2,14 @@ package com.linky.mybluetooth;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.ParcelUuid;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -33,6 +35,8 @@ public class MainActivity extends Activity {
     public static final String TAG = "MainActivity";
 
     private static final int REQUEST_ENABLE_BT = 3;
+    private static final int DEFAULT_INT_VALUE = -3141;
+    private static final short DEFAULT_SHORT_VALUE = -31;
 
     private BluetoothAdapter mBluetoothAdapter;
     private ListView mListView;
@@ -232,55 +236,101 @@ public class MainActivity extends Activity {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
 
-//            if(BluetoothDevice.ACTION_FOUND.equals(action)) {
-//                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-//                if(device.getBondState() != BluetoothDevice.BOND_BONDED) {
-//                    mNewDevicesArrayAdapter.addData(device);
-//                }
-//
-//            } else if(BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
-//                setProgressBarIndeterminateVisibility(false);
-//                Toast.makeText(MainActivity.this, "扫描完成", Toast.LENGTH_SHORT).show();
-//                if (mNewDevicesArrayAdapter.getCount() == 0) {
-//                    String noDevices = "no device found".toString();
-//                    Toast.makeText(MainActivity.this, noDevices, Toast.LENGTH_SHORT).show();
-////                    mNewDevicesArrayAdapter.addData(null);
-//                }
-//            }
-
             // Remote device discovered.
             if(BluetoothDevice.ACTION_FOUND.equals(action)) {
+                DebugLog.d(DebugLog.TAG, "MainActivity:onReceive" + " ACTION_FOUND");
 
+                BluetoothClass bc = intent.getParcelableExtra(BluetoothDevice.EXTRA_CLASS);
+                showAndDisplayBluetoothClass(bc);
 
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                showAndDisplayBluetoothDevice(device);
+
+                String extraName = intent.getStringExtra(BluetoothDevice.EXTRA_NAME);
+                DebugLog.d(DebugLog.TAG, "MainActivity:onReceive " + "extraName = " + extraName);
+
+                short extraShort = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, DEFAULT_SHORT_VALUE);
+                DebugLog.d(DebugLog.TAG, "MainActivity:onReceive " + "extraShort = " + extraShort   );
 
             // Indicates a low level (ACL) connection has been established with a remote device.
             } else if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
+                DebugLog.d(DebugLog.TAG, "MainActivity:onReceive " + "ACTION_ACL_CONNECTED");
 
             // Indicates a low level (ACL) disconnection from a remote device.
             } else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
+                DebugLog.d(DebugLog.TAG, "MainActivity:onReceive " + "ACTION_ACL_DISCONNECTED");
 
                 //  Indicates that a low level (ACL) disconnection has been requested for a remote device, and it will soon be disconnected.
             } else if (BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED.equals(action)) {
+                DebugLog.d(DebugLog.TAG, "MainActivity:onReceive " + "ACTION_ACL_DISCONNECT_REQUESTED");
 
                 // : Indicates a change in the bond state of a remote device.
             } else if (BluetoothDevice.ACTION_BOND_STATE_CHANGED.equals(action)) {
+                DebugLog.d(DebugLog.TAG, "MainActivity:onReceive " + "ACTION_BOND_STATE_CHANGED");
+
+                int previousBondState = intent.getIntExtra(BluetoothDevice.EXTRA_PREVIOUS_BOND_STATE, DEFAULT_INT_VALUE);
+                DebugLog.d(DebugLog.TAG, "MainActivity:onReceive " + "previousBondState = " + previousBondState );
 
                 // Bluetooth class of a remote device has changed.
             } else if (BluetoothDevice.ACTION_CLASS_CHANGED.equals(action)) {
+                DebugLog.d(DebugLog.TAG, "MainActivity:onReceive " + "ACTION_CLASS_CHANGED");
 
                 // Indicates the friendly name of a remote device has been retrieved for the first time, or changed since the last retrieval.
             } else if (BluetoothDevice.ACTION_NAME_CHANGED.equals(action)) {
+                DebugLog.d(DebugLog.TAG, "MainActivity:onReceive " + "ACTION_NAME_CHANGED");
 
                 // This intent is used to broadcast PAIRING REQUEST Requires BLUETOOTH_ADMIN to receive.
             } else if (BluetoothDevice.ACTION_PAIRING_REQUEST.equals(action)) {
+                DebugLog.d(DebugLog.TAG, "MainActivity:onReceive " + "ACTION_PAIRING_REQUEST");
+
+                int extraPairingKey = intent.getIntExtra(BluetoothDevice.EXTRA_PAIRING_KEY, DEFAULT_INT_VALUE);
+                int variant = intent.getIntExtra(BluetoothDevice.EXTRA_PAIRING_VARIANT,DEFAULT_INT_VALUE);
+                DebugLog.d(DebugLog.TAG, "MainActivity:onReceive " + "extraPairingKey = " + extraPairingKey);
+                DebugLog.d(DebugLog.TAG, "MainActivity:onReceive " + "variant = " + variant );
 
                 // This intent is used to broadcast the UUID wrapped as a ParcelUuid of the remote device after it has been fetched.
             } else if (BluetoothDevice.ACTION_UUID.equals(action)) {
+                DebugLog.d(DebugLog.TAG, "MainActivity:onReceive " + "ACTION_UUID");
 
+//                ParcelUuid[] pUUIDs = intent.getParcelableExtra(BluetoothDevice.EXTRA_UUID);
+//                for(ParcelUuid uuid : pUUIDs) {
+//                    DebugLog.d(DebugLog.TAG, "MainActivity:onReceive " + "uuid = " + uuid.getUuid().toString());
+//                }
+            } else if (BluetoothDevice.ACTION_NAME_CHANGED.equals(action)) {
+                DebugLog.d(DebugLog.TAG, "MainActivity:onReceive " + "ACTION_NAME_CHANGED");
+                BluetoothClass bc = intent.getParcelableExtra(BluetoothDevice.EXTRA_CLASS);
+                showAndDisplayBluetoothClass(bc);
             }
-
         }
-    }    ;
+    };
+
+    private void showAndDisplayBluetoothClass(BluetoothClass bc) {
+        int desc = bc.describeContents();
+        int deviceClass = bc.getDeviceClass();
+        int majorDevice = bc.getMajorDeviceClass();
+
+        DebugLog.d(DebugLog.TAG, "MainActivity:onReceive " + "desc = " + desc);
+        DebugLog.d(DebugLog.TAG, "MainActivity:onReceive " + "deviceClass = " + deviceClass);
+        DebugLog.d(DebugLog.TAG, "MainActivity:onReceive " + "majorDevice = " + majorDevice);
+    }
+
+    private void showAndDisplayBluetoothDevice(BluetoothDevice device) {
+        String address = device.getAddress();
+        int bondState = device.getBondState();
+        int type = device.getType();
+        ParcelUuid[] uuids = device.getUuids();
+        int desc = device.describeContents();
+
+        DebugLog.d(DebugLog.TAG, "MainActivity:showAndDisplayBluetoothDevice " + "address = " + address);
+        DebugLog.d(DebugLog.TAG, "MainActivity:showAndDisplayBluetoothDevice " + "bondState = " + bondState);
+        DebugLog.d(DebugLog.TAG, "MainActivity:showAndDisplayBluetoothDevice " + "type = " + type);
+        DebugLog.d(DebugLog.TAG, "MainActivity:showAndDisplayBluetoothDevice " + "desc = " + desc);
+
+        for(ParcelUuid uuid : uuids) {
+            DebugLog.d(DebugLog.TAG, "MainActivity:showAndDisplayBluetoothDevice " + "uuid = " + uuid.getUuid().toString());
+        }
+
+    }
 
     @Override
     protected void onDestroy() {
