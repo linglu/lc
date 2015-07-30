@@ -37,3 +37,4 @@ sco 是蓝牙基带的一个方式。蓝牙音频对称传输这些你应该从�
 
 #### 相关连接
 http://codego.net/554937/
+http://stackoverflow.com/questions/15127560/bluetoothheadset-why-is-it-necessary-to-use-a-timer-for-calling-startvoicerecog
