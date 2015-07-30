@@ -16,10 +16,12 @@
     private static String ACTION_UUID = BluetoothDevice.ACTION_UUID;
 ```
 运行，并执行连接操作，结果如下：
->* 连接上时，收到广播
-D/DebugLog( 9487): MainActivity:onReceive ACTION_ACL_CONNECTED
+>* 连接上时，收到广播<br />
+D/DebugLog(11323): MainActivity:onReceive ACTION_BOND_STATE_CHANGED
+D/DebugLog(11323): MainActivity:onReceive previousBondState = 10
+D/DebugLog(11323): MainActivity:onReceive ACTION_ACL_CONNECTED
 
->* 断开时，收到广播
+>* 断开时，收到广播<br />
 D/DebugLog( 9487): MainActivity:onReceive ACTION_ACL_DISCONNECTED
 D/DebugLog( 9487): MainActivity:onReceive ACTION_BOND_STATE_CHANGED
 D/DebugLog( 9487): MainActivity:onReceive previousBondState = 1
