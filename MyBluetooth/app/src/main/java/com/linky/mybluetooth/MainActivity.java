@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothHeadset;
+import android.bluetooth.BluetoothProfile;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -46,34 +48,94 @@ public class MainActivity extends Activity {
 
     private List<LocalBluetoothProfile> mProfiles;
 
+    BluetoothHeadset mBluetoothHeadset;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Intent in = new Intent(this, MyService.class);
+        startService(in);
+
+        // Get the default adapter
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        // Establish connection to the proxy.
+        mBluetoothAdapter.getProfileProxy(this, mProfileListener, BluetoothProfile.HEADSET);
+
+        // Close proxy connection after use.
+
         // 用于显示进度条，写在 setContentView 之前
-        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-        setContentView(R.layout.activity_main);
+//        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+//        setContentView(R.layout.activity_main);
+//
+//        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+//
+//        if(mBluetoothAdapter == null) {
+//            finish();
+//        }
+//
+//        if(!mBluetoothAdapter.isEnabled()) {
+//            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+//            startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
+//        }
+//
+//        // Register for broadcasts when a device is discovered
+//        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+//        registerReceiver(mDeviceReceiver, filter);
+//
+//        // Register for broadcasts when discovery has finished
+//        filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+//        this.registerReceiver(mDeviceReceiver, filter);
+//
+//        setupListView();
+    }
 
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+    private BluetoothProfile.ServiceListener mProfileListener = new BluetoothProfile.ServiceListener() {
+        public void onServiceConnected(int profile, BluetoothProfile proxy) {
+            DebugLog.d(DebugLog.TAG, "MainActivity:onServiceConnected ");
+            if (profile == BluetoothProfile.HEADSET) {
+                mBluetoothHeadset = (BluetoothHeadset) proxy;
 
-        if(mBluetoothAdapter == null) {
-            finish();
+                List<BluetoothDevice> devices = mBluetoothHeadset.getConnectedDevices();
+
+                DebugLog.d(DebugLog.TAG, "MainActivity:onServiceConnected " + "devices.size() = " + devices.size());
+                for(BluetoothDevice dev : devices) {
+                    String name = dev.getName();
+                    DebugLog.d(DebugLog.TAG, "MainActivity:onServiceConnected " + "name =" + name);
+                    boolean isAudioConnected = mBluetoothHeadset.isAudioConnected(dev);
+                    DebugLog.d(DebugLog.TAG, "MainActivity:onServiceConnected " + "isAudioConnected = " + isAudioConnected);
+
+                    /**
+                     * Start Bluetooth voice recognition. This methods sends the voice
+                     * recognition AT command to the headset and establishes the audio connection.
+                     * Users can listen to ACTION_AUDIO_STATE_CHANGED. If this function returns true,
+                     * this intent will be broadcasted with EXTRA_STATE set to STATE_AUDIO_CONNECTING.
+                     * EXTRA_STATE will transition from STATE_AUDIO_CONNECTING to STATE_AUDIO_CONNECTED
+                     * when audio connection is established and to STATE_AUDIO_DISCONNECTED in case of failure
+                     * to establish the audio connection.
+                     */
+                    boolean started = mBluetoothHeadset.startVoiceRecognition(dev);
+                    if(started) {   // 如果成功启动；
+                        DebugLog.d(DebugLog.TAG, "MainActivity:onServiceConnected " + "startVoiceRecognition started == true");
+                    } else {
+                        DebugLog.d(DebugLog.TAG, "MainActivity:onServiceConnected " + "startVoiceRecognition started == false");
+                    }
+                }
+            }
         }
-
-        if(!mBluetoothAdapter.isEnabled()) {
-            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
+        public void onServiceDisconnected(int profile) {
+            DebugLog.d(DebugLog.TAG, "MainActivity:onServiceDisconnected " + "");
+            if (profile == BluetoothProfile.HEADSET) {
+                mBluetoothHeadset = null;
+            }
         }
+    };
 
-        // Register for broadcasts when a device is discovered
-        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        registerReceiver(mDeviceReceiver, filter);
-
-        // Register for broadcasts when discovery has finished
-        filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-        this.registerReceiver(mDeviceReceiver, filter);
-
-        setupListView();
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mBluetoothAdapter.closeProfileProxy(BluetoothProfile.HEADSET, mBluetoothHeadset);
     }
 
     private void setupListView() {
