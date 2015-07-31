@@ -57,12 +57,6 @@ public class MainActivity extends Activity {
         Intent in = new Intent(this, MyService.class);
         startService(in);
 
-        // Get the default adapter
-        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-
-        // Establish connection to the proxy.
-        mBluetoothAdapter.getProfileProxy(this, mProfileListener, BluetoothProfile.HEADSET);
-
         // Close proxy connection after use.
 
         // 用于显示进度条，写在 setContentView 之前
@@ -91,46 +85,7 @@ public class MainActivity extends Activity {
 //        setupListView();
     }
 
-    private BluetoothProfile.ServiceListener mProfileListener = new BluetoothProfile.ServiceListener() {
-        public void onServiceConnected(int profile, BluetoothProfile proxy) {
-            DebugLog.d(DebugLog.TAG, "MainActivity:onServiceConnected ");
-            if (profile == BluetoothProfile.HEADSET) {
-                mBluetoothHeadset = (BluetoothHeadset) proxy;
 
-                List<BluetoothDevice> devices = mBluetoothHeadset.getConnectedDevices();
-
-                DebugLog.d(DebugLog.TAG, "MainActivity:onServiceConnected " + "devices.size() = " + devices.size());
-                for(BluetoothDevice dev : devices) {
-                    String name = dev.getName();
-                    DebugLog.d(DebugLog.TAG, "MainActivity:onServiceConnected " + "name =" + name);
-                    boolean isAudioConnected = mBluetoothHeadset.isAudioConnected(dev);
-                    DebugLog.d(DebugLog.TAG, "MainActivity:onServiceConnected " + "isAudioConnected = " + isAudioConnected);
-
-                    /**
-                     * Start Bluetooth voice recognition. This methods sends the voice
-                     * recognition AT command to the headset and establishes the audio connection.
-                     * Users can listen to ACTION_AUDIO_STATE_CHANGED. If this function returns true,
-                     * this intent will be broadcasted with EXTRA_STATE set to STATE_AUDIO_CONNECTING.
-                     * EXTRA_STATE will transition from STATE_AUDIO_CONNECTING to STATE_AUDIO_CONNECTED
-                     * when audio connection is established and to STATE_AUDIO_DISCONNECTED in case of failure
-                     * to establish the audio connection.
-                     */
-                    boolean started = mBluetoothHeadset.startVoiceRecognition(dev);
-                    if(started) {   // 如果成功启动；
-                        DebugLog.d(DebugLog.TAG, "MainActivity:onServiceConnected " + "startVoiceRecognition started == true");
-                    } else {
-                        DebugLog.d(DebugLog.TAG, "MainActivity:onServiceConnected " + "startVoiceRecognition started == false");
-                    }
-                }
-            }
-        }
-        public void onServiceDisconnected(int profile) {
-            DebugLog.d(DebugLog.TAG, "MainActivity:onServiceDisconnected " + "");
-            if (profile == BluetoothProfile.HEADSET) {
-                mBluetoothHeadset = null;
-            }
-        }
-    };
 
     @Override
     protected void onStop() {
