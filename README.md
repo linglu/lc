@@ -38,3 +38,17 @@ sco 是蓝牙基带的一个方式。蓝牙音频对称传输这些你应该从�
 #### 相关连接
 http://codego.net/554937/ <br />
 http://stackoverflow.com/questions/15127560/bluetoothheadset-why-is-it-necessary-to-use-a-timer-for-calling-startvoicerecog
+
+***
+8-8
+通过 TestKey 的运行 Demo，发现可以检测到蓝牙眼镜的下列按键可以像手机上的按键一样被检测到：
+KeyEvent.KEYCODE_MEDIA_PLAY:
+KeyEvent.KEYCODE_MEDIA_PAUSE:
+KeyEvent.KEYCODE_MEDIA_PREVIOUS:
+KeyEvent.KEYCODE_MEDIA_NEXT:
+
+
+
+
+
+
