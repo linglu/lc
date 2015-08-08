@@ -42,10 +42,10 @@ http://stackoverflow.com/questions/15127560/bluetoothheadset-why-is-it-necessary
 ***
 8-8
 通过 TestKey 的运行 Demo，发现可以检测到蓝牙眼镜的下列按键可以像手机上的按键一样被检测到：
-KeyEvent.KEYCODE_MEDIA_PLAY:
-KeyEvent.KEYCODE_MEDIA_PAUSE:
-KeyEvent.KEYCODE_MEDIA_PREVIOUS:
-KeyEvent.KEYCODE_MEDIA_NEXT:
+KeyEvent.KEYCODE_MEDIA_PLAY:<br />
+KeyEvent.KEYCODE_MEDIA_PAUSE:<br />
+KeyEvent.KEYCODE_MEDIA_PREVIOUS:<br />
+KeyEvent.KEYCODE_MEDIA_NEXT:<br />
 
 
 
